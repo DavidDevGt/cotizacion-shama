@@ -435,7 +435,7 @@ switch ($op) {
                 return '0|Contraseña incorrecta';
             }
         } else {
-            return '0|Usuario no encontrado';
+            echo '0|Usuario no encontrado';
         }
         break;
 
