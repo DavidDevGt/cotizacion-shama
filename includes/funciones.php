@@ -415,7 +415,53 @@ switch ($op) {
         }
         break;
 
+    case "iniciar_sesion":
+        $correo_electronico = $_POST['correo_electronico'];
+        $contrasena = $_POST['contrasena'];
+
+        $consulta = "SELECT usuario_id, contrasena, nombre, rol FROM Usuarios WHERE correo_electronico = '$correo_electronico'";
+        $resultado = dbQuery($consulta);
+
+        if (mysqli_num_rows($resultado) > 0) {
+            $usuario = mysqli_fetch_assoc($resultado);
+            if (password_verify($contrasena, $usuario['contrasena'])) {
+                // Aquí puedes iniciar la sesión y almacenar la información del usuario
+                $_SESSION['usuario_autenticado'] = true;
+                $_SESSION['usuario_id'] = $usuario['usuario_id'];
+                $_SESSION['nombre'] = $usuario['nombre'];
+                $_SESSION['rol'] = $usuario['rol'];
+                return '1|Inicio de sesión exitoso';
+            } else {
+                return '0|Contraseña incorrecta';
+            }
+        } else {
+            return '0|Usuario no encontrado';
+        }
+        break;
+
+    case "autenticarUsuario":
+        $correo_electronico = $_POST['correo_electronico'];
+        $contrasena = $_POST['contrasena'];
+
+        $consulta = "SELECT usuario_id, contrasena FROM Usuarios WHERE correo_electronico = '$correo_electronico' AND active=1"; // Asegurándonos también de que el usuario esté activo
+        $resultado = dbQuery($consulta);
+
+        if (mysqli_num_rows($resultado) > 0) {
+            $usuario = mysqli_fetch_assoc($resultado);
+            if (password_verify($contrasena, $usuario['contrasena'])) {
+                echo "1|{$usuario['usuario_id']}"; // En caso de éxito, retornamos el ID del usuario
+            } else {
+                echo '0|Contraseña incorrecta';
+            }
+        } else {
+            echo '0|Usuario no encontrado o no activo';
+        }
+        break;
+
+
     default:
         echo '0|Operación no válida.';
         break;
 }
+
+
