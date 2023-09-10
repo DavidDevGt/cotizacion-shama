@@ -154,6 +154,267 @@ switch ($op) {
         }
         break;
 
+    case "agregar_detalle":
+        $cotizacion_id = $_POST['cotizacion_id'];
+        $producto_id = $_POST['producto_id'];
+        $cantidad = $_POST['cantidad'];
+        $precio_unitario = $_POST['precio_unitario'];
+        $total = $_POST['total'];
+
+        $consulta = "INSERT INTO Cotizacion_detalles (cotizacion_id, producto_id, cantidad, precio_unitario, total) VALUES ('$cotizacion_id', '$producto_id', '$cantidad', '$precio_unitario', '$total')";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Detalle agregado con éxito';
+        } else {
+            echo '0|Error al agregar detalle';
+        }
+        break;
+
+    case "obtener_detalle":
+        $detalle_id = $_POST['detalle_id'];
+        $consulta = "SELECT * FROM Cotizacion_detalles WHERE detalle_id = $detalle_id";
+        $resultado = dbQuery($consulta);
+
+        if (mysqli_num_rows($resultado) > 0) {
+            echo '1|' . json_encode(mysqli_fetch_assoc($resultado));
+        } else {
+            echo '0|Detalle no encontrado';
+        }
+        break;
+
+    case "actualizar_detalle":
+        $detalle_id = $_POST['detalle_id'];
+        $cotizacion_id = $_POST['cotizacion_id'];
+        $producto_id = $_POST['producto_id'];
+        $cantidad = $_POST['cantidad'];
+        $precio_unitario = $_POST['precio_unitario'];
+        $total = $_POST['total'];
+
+        $consulta = "UPDATE Cotizacion_detalles SET cotizacion_id='$cotizacion_id', producto_id='$producto_id', cantidad='$cantidad', precio_unitario='$precio_unitario', total='$total' WHERE detalle_id=$detalle_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Detalle actualizado con éxito';
+        } else {
+            echo '0|Error al actualizar detalle';
+        }
+        break;
+
+    case "eliminar_detalle":
+        $detalle_id = $_POST['detalle_id'];
+        $consulta = "DELETE FROM Cotizacion_detalles WHERE detalle_id = $detalle_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Detalle eliminado con éxito';
+        } else {
+            echo '0|Error al eliminar detalle';
+        }
+        break;
+
+    case "listar_detalles_cotizacion":
+        $cotizacion_id = $_POST['cotizacion_id'];
+        $consulta = "SELECT * FROM Cotizacion_detalles WHERE cotizacion_id = $cotizacion_id";
+        $resultado = dbQuery($consulta);
+        $response = array();
+
+        if (mysqli_num_rows($resultado) > 0) {
+            while ($fila = mysqli_fetch_assoc($resultado)) {
+                array_push($response, $fila);
+            }
+            echo '1|' . json_encode($response);
+        } else {
+            echo '0|No hay detalles para esta cotización';
+        }
+        break;
+
+    case "agregar_producto":
+        $nombre = $_POST['nombre'];
+        $descripcion = $_POST['descripcion'];
+        $precio = $_POST['precio'];
+        $stock = $_POST['stock'];
+
+        $consulta = "INSERT INTO Productos (nombre, descripcion, precio, stock) VALUES ('$nombre', '$descripcion', '$precio', '$stock')";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Producto agregado con éxito';
+        } else {
+            echo '0|Error al agregar producto';
+        }
+        break;
+
+    case "obtener_producto":
+        $producto_id = $_POST['producto_id'];
+        $consulta = "SELECT * FROM Productos WHERE producto_id = $producto_id";
+        $resultado = dbQuery($consulta);
+
+        if (mysqli_num_rows($resultado) > 0) {
+            echo '1|' . json_encode(mysqli_fetch_assoc($resultado));
+        } else {
+            echo '0|Producto no encontrado';
+        }
+        break;
+
+    case "actualizar_producto":
+        $producto_id = $_POST['producto_id'];
+        $nombre = $_POST['nombre'];
+        $descripcion = $_POST['descripcion'];
+        $precio = $_POST['precio'];
+        $stock = $_POST['stock'];
+
+        $consulta = "UPDATE Productos SET nombre='$nombre', descripcion='$descripcion', precio='$precio', stock='$stock' WHERE producto_id=$producto_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Producto actualizado con éxito';
+        } else {
+            echo '0|Error al actualizar producto';
+        }
+        break;
+
+    case "eliminar_producto":
+        $producto_id = $_POST['producto_id'];
+        $consulta = "DELETE FROM Productos WHERE producto_id = $producto_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Producto eliminado con éxito';
+        } else {
+            echo '0|Error al eliminar producto';
+        }
+        break;
+
+    case "listar_productos":
+        $consulta = "SELECT * FROM Productos";
+        $resultado = dbQuery($consulta);
+        $response = array();
+
+        if (mysqli_num_rows($resultado) > 0) {
+            while ($fila = mysqli_fetch_assoc($resultado)) {
+                array_push($response, $fila);
+            }
+            echo '1|' . json_encode($response);
+        } else {
+            echo '0|No hay productos disponibles';
+        }
+        break;
+
+    case "productos_bajo_stock":
+        $limite_stock = $_POST['limite_stock'];
+        $consulta = "SELECT * FROM Productos WHERE stock <= $limite_stock";
+        $resultado = dbQuery($consulta);
+        $response = array();
+
+        if (mysqli_num_rows($resultado) > 0) {
+            while ($fila = mysqli_fetch_assoc($resultado)) {
+                array_push($response, $fila);
+            }
+            echo '1|' . json_encode($response);
+        } else {
+            echo '0|Todos los productos tienen stock adecuado';
+        }
+        break;
+
+    case "registrar_usuario":
+        $nombre = $_POST['nombre'];
+        $apellido = $_POST['apellido'];
+        $correo_electronico = $_POST['correo_electronico'];
+        $contrasena = $_POST['contrasena'];
+        $contrasena_encriptada = password_hash($contrasena, PASSWORD_DEFAULT);
+        $rol = $_POST['rol'];
+
+        $consulta = "INSERT INTO Usuarios (nombre, apellido, correo_electronico, contrasena, active, rol) VALUES ('$nombre', '$apellido', '$correo_electronico', '$contrasena_encriptada', 1, '$rol')";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Usuario registrado con éxito';
+        } else {
+            echo '0|Error al registrar usuario';
+        }
+        break;
+
+    case "obtener_usuario":
+        $usuario_id = $_POST['usuario_id'];
+        $consulta = "SELECT usuario_id, nombre, apellido, correo_electronico, active, rol FROM Usuarios WHERE usuario_id = $usuario_id";
+        $resultado = dbQuery($consulta);
+
+        if (mysqli_num_rows($resultado) > 0) {
+            echo '1|' . json_encode(mysqli_fetch_assoc($resultado));
+        } else {
+            echo '0|Usuario no encontrado';
+        }
+        break;
+
+    case "actualizar_usuario":
+        $usuario_id = $_POST['usuario_id'];
+        $nombre = $_POST['nombre'];
+        $apellido = $_POST['apellido'];
+        $correo_electronico = $_POST['correo_electronico'];
+        $rol = $_POST['rol'];
+
+        $consulta = "UPDATE Usuarios SET nombre='$nombre', apellido='$apellido', correo_electronico='$correo_electronico', rol='$rol' WHERE usuario_id=$usuario_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Usuario actualizado con éxito';
+        } else {
+            echo '0|Error al actualizar usuario';
+        }
+        break;
+
+    case "eliminar_usuario":
+        $usuario_id = $_POST['usuario_id'];
+        $consulta = "DELETE FROM Usuarios WHERE usuario_id = $usuario_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Usuario eliminado con éxito';
+        } else {
+            echo '0|Error al eliminar usuario';
+        }
+        break;
+
+    case "listar_usuarios":
+        $consulta = "SELECT usuario_id, nombre, apellido, correo_electronico, active, rol FROM Usuarios";
+        $resultado = dbQuery($consulta);
+        $response = array();
+
+        if (mysqli_num_rows($resultado) > 0) {
+            while ($fila = mysqli_fetch_assoc($resultado)) {
+                array_push($response, $fila);
+            }
+            echo '1|' . json_encode($response);
+        } else {
+            echo '0|No hay usuarios registrados';
+        }
+        break;
+
+    case "activar_usuario":
+        $usuario_id = $_POST['usuario_id'];
+        $consulta = "UPDATE Usuarios SET active=1 WHERE usuario_id = $usuario_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Usuario activado con éxito';
+        } else {
+            echo '0|Error al activar usuario';
+        }
+        break;
+
+    case "desactivar_usuario":
+        $usuario_id = $_POST['usuario_id'];
+        $consulta = "UPDATE Usuarios SET active=0 WHERE usuario_id = $usuario_id";
+        $resultado = dbQuery($consulta);
+
+        if ($resultado) {
+            echo '1|Usuario desactivado con éxito';
+        } else {
+            echo '0|Error al desactivar usuario';
+        }
+        break;
+
     default:
         echo '0|Operación no válida.';
         break;
